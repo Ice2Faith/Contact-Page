@@ -2,8 +2,12 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
+#include <direct.h>
 #include <io.h>
+#include <unistd.h>
 #define MAXRECORD 1024
+#define MAXSIZE 1024
+#define KEY "ContactPage-I2F"
 typedef struct
 {
     char name[40];  //姓名
@@ -22,6 +26,7 @@ typedef struct
     int count;  //找到的信息数量
 } Search;   //索引查找信息存储
 
+int FileLocker(char * FileName,char * password);
 Contact * InitContact(void);    //创建节点或初始化头结点
 char Meau(void);    //菜单选择
 void ViewAll(Contact * List);   //显示所有联系人，传入整个通讯录
@@ -37,6 +42,7 @@ void Help();    //帮助文本
 
 int main(int argv,char * argc[])
 {
+    rename(argc[0],"冰念通讯录.exe");
     system("title 冰念通讯录 Dev: Ice2Faith");
     system("color f5");
     system("mode con cols=80");
@@ -68,9 +74,10 @@ int main(int argv,char * argc[])
             fflush(stdin);
             if(seld>=0&&seld<slist.count)
             {
-              DelRecord(slist.search[seld]);
-              printf("删除成功！\n");
-            }else
+                DelRecord(slist.search[seld]);
+                printf("删除成功！\n");
+            }
+            else
                 printf("选择不合法！\n");
             break;
         }
@@ -90,8 +97,9 @@ int main(int argv,char * argc[])
             fflush(stdin);
             if(sels>=0&&sels<slist.count)
             {
-              ModifyRecord((slist.search[sels])->next);
-            }else
+                ModifyRecord((slist.search[sels])->next);
+            }
+            else
                 printf("输入不合法！\n");
             break;
         }
@@ -163,9 +171,9 @@ void ReadContact(Contact * List)
     char pathinfo[1024]= {"C:\\ContactData"};
     char mind[2048];
     sprintf(mind,"%s\\ContactList.bin",pathinfo);
-
     if(access(mind,F_OK)!=0)    //检查文件是否存在，不存在就不进行读取
         return;
+
     FILE * Path=fopen(mind,"r");
     int count=0;
     int i=0;
@@ -211,6 +219,7 @@ void WriteContact(Contact * List)
         P=P->next;
     }
     fclose(Path);
+
 }
 void ViewAll(Contact * List)
 {
@@ -356,3 +365,5 @@ void Help()
     printf("\tDev:\t\tIce2Faith/冰念\n");
     printf("-------------------------------------------\n");
 }
+
+
